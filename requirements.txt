@@ -1,0 +1,6 @@
+python-dotenv==1.0.1
+python_dateutil==2.8.2
+pytz==2023.3.post1
+quart==0.19.9
+twitchAPI==4.3.1
+twitchio==2.9.1

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Losowanie graczy</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+        }
+
+        h1 {
+            color: #2c3e50;
+        }
+
+        #wrapper {
+            margin: 20px auto;
+            width: 80%;
+            overflow: hidden;
+            border: 2px solid #2980b9;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            position: relative;
+            display: flex;
+        }
+
+        li {
+            width: 100px;
+            padding: 10px;
+            margin: 5px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            font-size: 13px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #27ae60;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #result {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #e74c3c;
+        }
+
+        #counter {
+            font-size: 20px;
+            margin-top: 20px;
+        }
+
+        .test ol {
+            display: flex; 
+            padding: 0; 
+            margin: 0; 
+            list-style-type: none; 
+            flex-wrap: wrap; 
+        }
+
+        .test ol li {
+            width: 8%; 
+            box-sizing: border-box;
+            padding: 5px; 
+            font-size: 12px; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            white-space: nowrap; 
+        }
+    </style>
+</head>
+<body>
+    {% include 'nav.html' %}
+    <h1>Losowanie Nicków</h1>
+    <div id="wrapper">
+        <ul id="playerList">
+            {% for user, streamer in usersy %}
+                <li>{{ user }} <br>Streamer: {{ streamer }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    Stan bota: {{status[0]}}
+    <br>
+    Kondnda do losowania: {{prefix}}los
+    <br>
+    <input type="number" id="duration" placeholder="Czas w sekundach" min="1" />
+    <button id="button">start</button>
+    <form action="{{ url_for('clear') }}" method="post" style="display:inline;">
+        <button type="submit">clear</button>
+    </form>
+    <form action="{{ url_for('start') }}" method="post" style="display:inline;">
+        <button id="startButton" type="submit">Właczenie Zapisywania</button>
+    </form>
+    <form action="{{ url_for('stop') }}" method="post" style="display:inline;">
+        <button id="stopButton" type="submit">Zatrzymanie Zapisywania</button>
+    </form>
+    
+    <div>Wygrywa:</div>
+    <div id="result">....</div>
+    <div id="counter">Czas: <span id="count">0</span> sekund</div>
+ <script>
+      let autoRefresh = false;
+        let refreshInterval;
+
+        function startAutoRefresh() {
+            if (!autoRefresh) {
+                autoRefresh = true;
+                refreshInterval = setInterval(() => {
+                    location.reload();
+                }, 30000); // 30 sekund
+            }
+        }
+
+        function stopAutoRefresh() {
+            if (autoRefresh) {
+                clearInterval(refreshInterval);
+                autoRefresh = false;
+            }
+        }
+
+        // Funkcja, która sprawdzi status bota i włączy/wyłączy odświeżanie
+        function checkBotStatus() {
+            const status = "{{ status[0] if status else 'STOP' }}"; // Zakładam, że status jest w formacie krotki
+            if (status === "OK") {
+                startAutoRefresh();
+            } else {
+                stopAutoRefresh();
+            }
+        }
+
+        window.onload = checkBotStatus;
+        $(document).ready(function () {
+            const users = {{ usersy | tojson }};
+            for (let i = 0; i < users.length; i++) {
+                $('#playerList').append('<li>' + users[i][0] + '<br> Streamer: ' + users[i][1] + '</li>');
+            }
+
+            $('#playerList').append($('#playerList').html());
+            $('#playerList').append($('#playerList').html());
+            $('#playerList').append($('#playerList').html());
+            $('#playerList').append($('#playerList').html());
+            $('#playerList').append($('#playerList').html());
+            $('#playerList').append($('#playerList').html());
+
+            let stop = false;
+            let speed = 50;
+            let counter = 0; // Inicjalizuj licznik
+            let interval; // Zmienna do przechowywania interwału
+
+            $("#button").click(function () {
+                const duration = parseInt($("#duration").val()) || 0;
+                if (duration > 0) {
+                    stop = false; 
+                    $(this).text("stop");
+                    $("#result").empty();
+                    counter = 0; 
+                    $("#count").text(counter); 
+                    interval = setInterval(function() {
+                        counter++; 
+                        $("#count").text(counter); 
+                    }, 1000); 
+
+                    setTimeout(function() {
+                        stop = true; 
+                        clearInterval(interval);
+                        $("#button").text("start");
+                        $("ul").stop(true); 
+                        show(); 
+                    }, duration * 1000); 
+                    scroll();
+                } else {
+                    alert("Proszę wprowadzić prawidłowy czas w sekundach.");
+                }
+            });
+
+            function scroll() {
+                if (stop) {
+                    return;
+                }
+
+                $("ul").animate({ left: "-=" + 100 + "px" }, speed, "linear", function () {
+                    const firstItem = $("ul > li").first();
+                    if (parseInt(firstItem.css("left")) <= -100) {
+                        firstItem.css("left", "0px").appendTo("ul");
+                    }    
+                    scroll();
+                });
+            }
+
+            function show() {
+                const count = $("ul > li").length; 
+                const winnerIndex = Math.floor(Math.random() * (count / 2)); 
+                const winner = $("ul > li").eq(winnerIndex).text(); 
+                $("#result").text("Zwycięzca: " + winner);
+            }
+        });
+    </script>
+    <div class="test">
+        <ol>
+            {% for user, streamer in usersy %}
+            <li>
+                {{user}}<br>{{streamer}}
+            </li>
+            {% endfor %}
+        </ol>
+    </div>
+</body>
+</html>

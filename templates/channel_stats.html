@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statystyki Kanału Twitch</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+</head>
+
+<body>
+    {% include 'nav.html' %}
+    <div class="container">
+        <h1 class="mt-5">Statystyki Kanału Twitch</h1>
+        <form id="statsForm" class="mt-3">
+            <div class="mb-3">
+                <label for="login" class="form-label">Wprowadź login Twitcha:</label>
+                <input type="text" class="form-control" id="login" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Załaduj statystyki</button>
+        </form>
+        <a href="/" class="btn btn-secondary mt-3">Powrót do strony głównej</a>
+        <div id="stats" class="mt-4"></div>
+    </div>
+
+    <script>
+        document.getElementById('statsForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const login = document.getElementById('login').value;
+            const response = await fetch('/channel_stats', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({ login: login })
+            });
+
+            const statsDiv = document.getElementById('stats');
+            statsDiv.innerHTML = '';
+
+            if (response.ok) {
+                const stats = await response.json();
+                statsDiv.innerHTML = `
+                    <h3>${stats.nazwa_użytkownika}</h3>
+                    <p>${stats.opis}</p>
+                    <p>Obserwujący: ${stats.ilość_obserwujących}</p>
+                    <h4>Status: ${stats.status}</h4>
+                    <h4>Nazwa gry: ${stats.game_name}</h4>
+                    <h4>Liczba widzów: ${stats.viewer_count}</h4>
+                    <h4>Filmy:</h4>
+                    <ul>${stats.filmy.map(video => `<li><a href="${video.link}">${video.tytuł}</a> Utworzone: ${video.data_utworzenia}, Opublikowane: ${video.data_publikacji}</li>`).join('')}</ul>
+                `;
+            } else {
+                const error = await response.json();
+                statsDiv.innerHTML = `<p class="text-danger">${error.error}</p>`;
+            }
+        });
+    </script>
+</body>
+
+</html>

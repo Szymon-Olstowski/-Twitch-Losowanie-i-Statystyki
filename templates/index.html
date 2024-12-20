@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitch Losowanie i Statystyki</title>
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header {
+    background: #35424a;
+    color: #ffffff;
+    padding: 20px 0;
+    text-align: center;
+}
+
+h1 {
+    margin: 0;
+}
+
+h2 {
+    color: #35424a;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul li {
+    background: #ffffff;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+pre {
+    background: #eaeaea;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+}
+
+footer {
+    text-align: center;
+    padding: 10px 0;
+    background: #35424a;
+    color: #ffffff;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+    </style>
+</head>
+<body>
+    {% include 'nav.html' %}
+
+    <header>
+        <h1>Twitch Losowanie i Statystyki</h1>
+        <p>Aplikacja webowa do losowania widzów i wyświetlania statystyk kanałów Twitch.</p>
+    </header>
+
+    <main>
+        <section>
+            <h2>Wymagania systemowe</h2>
+            <ul>
+                <li>Python 3.11.5 lub nowszy</li>
+                <li>Przeglądarka internetowa</li>
+                <li>Konto na platformie Twitch</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Struktura projektu</h2>
+            <h3>Pliki główne:</h3>
+            <ul>
+                <li><strong>main.py</strong> - Główny plik aplikacji Flask, odpowiedzialny za uruchomienie serwera i obsługę routingu</li>
+                <li><strong>twitch_bot.py</strong> - Bot Twitch, służący do interakcji z czatem i wykonywania komend</li>
+                <li><strong>requirements.txt</strong> - Lista zależności projektu</li>
+                <li><strong>.env</strong> - Plik konfiguracyjny ze zmiennymi środowiskowymi</li>
+                <li><strong>channels.txt</strong> - Lista kanałów Twitch do monitorowania</li>
+            </ul>
+            <h3>Katalog templates/:</h3>
+            <ul>
+                <li><strong>index.html</strong> - Strona główna aplikacji</li>
+                <li><strong>los.html</strong> - Strona losowania elementów</li>
+                <li><strong>clips.html</strong> - Strona wyświetlająca klipy</li>
+                <li><strong>channel_stats.html</strong> - Statystyki kanału</li>
+                <li><strong>nav.html</strong> - Wspólna nawigacja dla wszystkich stron</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Instrukcja instalacji</h2>
+            <ol>
+                <li>Zainstaluj wymagane pakiety:
+                    <pre><code>pip install -r requirements.txt</code></pre>
+                </li>
+                <li>Skomfigurować plik .env</li>
+                <li>W pliku channels.txt są przechowywane nazwy kanałów do losowania i zmiany trzeba robić przed uruchomieniem strony</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Poradnik: Jak stworzyć token do bota z Twitcha</h2>
+            <ol>
+                <li>Otwórz przeglądarkę i przejdź do <a href="https://twitchtokengenerator.com/quick/vR5wTrOJ15">Twitch Token Generator</a>.</li>
+                <li>Zaloguj się na swoje konto Twitch.</li>
+                <li>Kliknij przycisk "Generate Token".</li>
+                <li>Skopiuj wygenerowany token i zapisz go w pliku: .env.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Jak uzyskać dostęp do Twitch API</h2>
+            <ol>
+                <li>Przejdź do <a href="https://dev.twitch.tv/console/apps">Twitch Developer Portal</a>.</li>
+                <li>Zaloguj się na swoje konto Twitch.</li>
+                <li>Kliknij przycisk "Register Your Application".</li>
+                <li>Wypełnij formularz rejestracyjny:
+                    <ul>
+                        <li><strong>Name</strong>: Nazwa Twojej aplikacji.</li>
+                        <li><strong>OAuth Redirect URLs</strong>: Wpisz adres: https://localhost</li>
+                        <li><strong>Category</strong>: Wybierz kategorię Other</li>
+                    </ul>
+                </li>
+                <li>Kliknij "Create".</li>
+                <li>Po zarejestrowaniu aplikacji, przejdź do jej ustawień.</li>
+                <li>Skopiuj <strong>Client ID</strong> i <strong>Client Secret</strong> i wpisz je w pliku .env.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Uruchom aplikację</h2>
+            <p>Aby uruchomić aplikację, użyj poniższego polecenia:</p>
+            <pre><code>python main.py</code></pre>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Twitch Losowanie i Statystyki. Kod Open source.</p>
+    </footer>
+</body>
+</html>
